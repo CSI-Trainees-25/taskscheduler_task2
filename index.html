@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,94 +11,140 @@
 <div class="wrapper">
     <header class="top-header">
         <h1><i class="fas fa-tasks"></i> Task Timer</h1>
-        <p>Plan, organize, and track your tasks with time management</p>
+        <p>Plan, organize, and track your tasks</p>
     </header>
 
-    <div class="main-grid">
-  
-        <div class="box form-box">
-            <h2><i class="fas fa-plus-circle"></i> Add New Task</h2>
-            
-            <div class="field">
-                <label for="titleInput">Task Title</label>
-                <input type="text" id="titleInput" placeholder="Enter task name">
+    <div id="mainPage">
+        <div class="main-grid">
+            <div class="box form-box">
+                <h2><i class="fas fa-plus-circle"></i> Add Task</h2>
+                
+                <div class="field">
+                    <label>Task Title</label>
+                    <input type="text" id="titleInput" placeholder="Enter task name">
+                </div>
+
+                <div class="field">
+                    <label>Duration (minutes)</label>
+                    <input type="number" id="durationInput" placeholder="e.g. 30" min="1">
+                </div>
+
+                <div class="field">
+                    <label>Date & Time</label>
+                    <input type="datetime-local" id="dateInput">
+                </div>
+
+                <div class="field">
+                    <label>Priority</label>
+                    <select id="prioritySelect">
+                        <option value="low">Low</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+
+                <button class="btn add-btn" id="addBtn">
+                    <i class="fas fa-plus"></i> Add Task
+                </button>
             </div>
 
-            <div class="field">
-                <label for="durationInput">Duration (minutes)</label>
-                <input type="number" id="durationInput" placeholder="e.g. 30" min="1">
-            </div>
+            <div class="box task-box">
+                <div class="task-head">
+                    <h2><i class="fas fa-list-check"></i> Task List</h2>
+                    <span id="taskCount">0 tasks</span>
+                </div>
 
-            <div class="field">
-                <label for="dateInput">Scheduled Date & Time</label>
-                <input type="datetime-local" id="dateInput">
-            </div>
+                <div id="listBox" class="task-list">
+                    <div class="no-task">
+                        <i class="fas fa-clipboard-list"></i>
+                        <p>No tasks yet</p>
+                    </div>
+                </div>
 
-            <div class="field">
-                <label for="prioritySelect">Priority Level</label>
-                <select id="prioritySelect">
-                    <option value="low">Low Priority</option>
-                    <option value="medium" selected>Medium Priority</option>
-                    <option value="high">High Priority</option>
-                </select>
+                <div class="drag-info">
+                    <i class="fas fa-hand-point-up"></i> Drag to reorder
+                </div>
             </div>
-
-            <button class="btn add-btn" id="addBtn">
-                <i class="fas fa-plus"></i> Add Task
-            </button>
         </div>
 
-   
-        <div class="box task-box">
-            <div class="task-head">
-                <h2><i class="fas fa-list-check"></i> Task List</h2>
-                <span id="taskCount">0 tasks</span>
+        <div class="box progress-box">
+            <h2><i class="fas fa-chart-line"></i> Progress</h2>
+            <div class="stats-row">
+                <div class="stat">
+                    <div class="num" id="totalCount">0</div>
+                    <div class="label">Total</div>
+                </div>
+                <div class="stat">
+                    <div class="num" id="doingCount">0</div>
+                    <div class="label">In Progress</div>
+                </div>
+                <div class="stat">
+                    <div class="num" id="doneCount">0</div>
+                    <div class="label">Done</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="box timer-box">
+            <h2><i class="fas fa-clock"></i> Timer</h2>
+            <div id="timerBox" class="timer-display">
+                <i class="fas fa-clock"></i> Ready
+            </div>
+            <div class="task-buttons">
+                <button class="btn start-btn" id="startAll">
+                    <i class="fas fa-play"></i> Start All
+                </button>
+            </div>
+            <div class="break-note">
+                <i class="fas fa-coffee"></i> Breaks between tasks
+            </div>
+        </div>
+    </div>
+
+    <div id="summaryPage" class="summary-screen" style="display: none;">
+        <div class="box summary-box">
+            <div class="summary-header">
+                <h2><i class="fas fa-trophy"></i> All Tasks Completed!</h2>
+                <p>Great job! Here's your summary</p>
             </div>
 
-            <div id="listBox" class="task-list">
-                <div class="no-task">
-                    <i class="fas fa-clipboard-list"></i>
-                    <p>No tasks yet. Add one above!</p>
+            <div class="summary-stats">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                    <div class="stat-info">
+                        <div class="stat-num" id="totalTime">0 min</div>
+                        <div class="stat-label">Planned Time</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-stopwatch"></i></div>
+                    <div class="stat-info">
+                        <div class="stat-num" id="actualTime">0 min</div>
+                        <div class="stat-label">Actual Time</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-bolt"></i></div>
+                    <div class="stat-info">
+                        <div class="stat-num" id="efficiency">0%</div>
+                        <div class="stat-label">Efficiency</div>
+                    </div>
                 </div>
             </div>
 
-            <div class="drag-info">
-                <i class="fas fa-hand-point-up"></i> Drag tasks to reorder
+            <div class="task-details">
+                <h3><i class="fas fa-list-check"></i> Task Details</h3>
+                <div id="taskDetailsList" class="details-list"></div>
             </div>
-        </div>
-    </div>
 
-    <div class="box progress-box">
-        <h2><i class="fas fa-chart-line"></i> Progress Overview</h2>
-        <div class="stats-row">
-            <div class="stat">
-                <div class="num" id="totalCount">0</div>
-                <div class="label">Total Tasks</div>
+            <div class="summary-actions">
+                <button class="btn back-btn" id="backToApp">
+                    <i class="fas fa-arrow-left"></i> Back
+                </button>
+                <button class="btn new-btn" id="newSession">
+                    <i class="fas fa-plus"></i> New Session
+                </button>
             </div>
-            <div class="stat">
-                <div class="num" id="doingCount">0</div>
-                <div class="label">In Progress</div>
-            </div>
-            <div class="stat">
-                <div class="num" id="doneCount">0</div>
-                <div class="label">Completed</div>
-            </div>
-        </div>
-    </div>
-
-
-    <div class="box timer-box">
-        <h2><i class="fas fa-clock"></i> Timer Controls</h2>
-        <div id="timerBox" class="timer-display">
-            <i class="fas fa-clock"></i> Ready to start task
-        </div>
-        <div class="task-buttons">
-            <button class="btn start-btn" id="startAll">
-                <i class="fas fa-play"></i> Start All
-            </button>
-        </div>
-        <div class="break-note">
-            <i class="fas fa-coffee"></i> Take short breaks between tasks
         </div>
     </div>
 </div>
