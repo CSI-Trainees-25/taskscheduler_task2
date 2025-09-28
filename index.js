@@ -31,43 +31,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
-    addBtn.addEventListener('click', function() {
-        const title = titleInput.value.trim();
-        const mins = parseInt(durationInput.value);
-        const date = dateInput.value;
-        const priority = prioritySelect.value;
-
-        if (!title || isNaN(mins) || mins <= 0 || !date) {
-            alert('Please fill all fields correctly');
-            return;
-        }
-
-        const task = {
-            id: Date.now(),
-            title,
-            mins,
-            date,
-            priority,
-            status: 'pending',
-            start: null,
-            end: null,
-            spent: null
-        };
-
-        taskList.push(task);
-        save();
-        drawTasks();
-        updateStats();
-
     
-        titleInput.value = '';
-        durationInput.value = '';
-        dateInput.value = '';
-        prioritySelect.value = 'medium';
-    });
 
   
- 
+    function setup() {
+        drawTasks();
+        updateStats();
+        setMinDate();
+        if (taskList.length > 0) {
+            taskCount.textContent = `${taskList.length} tasks`;
+        }
+    }
+
+    function setMinDate() {
+        const now = new Date();
+        const y = now.getFullYear();
+        const m = String(now.getMonth() + 1).padStart(2, '0');
+        const d = String(now.getDate()).padStart(2, '0');
+        const h = String(now.getHours()).padStart(2, '0');
+        const min = String(now.getMinutes()).padStart(2, '0');
+        dateInput.min = `${y}-${m}-${d}T${h}:${min}`;
+    }
+
 
     
 
