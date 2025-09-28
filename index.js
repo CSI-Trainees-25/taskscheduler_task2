@@ -38,4 +38,141 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-   
+    function setMinDate() {
+        const now = new Date();
+        const y = now.getFullYear();
+        const m = String(now.getMonth() + 1).padStart(2, '0');
+        const d = String(now.getDate()).padStart(2, '0');
+        const h = String(now.getHours()).padStart(2, '0');
+        const min = String(now.getMinutes()).padStart(2, '0');
+        dateInput.min = `${y}-${m}-${d}T${h}:${min}`;
+    }
+
+
+    addBtn.addEventListener('click', function() {
+        const title = titleInput.value.trim();
+        const mins = parseInt(durationInput.value);
+        const date = dateInput.value;
+        const priority = prioritySelect.value;
+
+        if (!title || isNaN(mins) || mins <= 0 || !date) {
+            alert('Please fill all fields correctly');
+            return;
+        }
+
+        const task = {
+            id: Date.now(),
+            title,
+            mins,
+            date,
+            priority,
+            status: 'pending',
+            start: null,
+            end: null,
+            spent: null
+        };
+
+        taskList.push(task);
+        save();
+        drawTasks();
+        updateStats();
+
+    
+        titleInput.value = '';
+        durationInput.value = '';
+        dateInput.value = '';
+        prioritySelect.value = 'medium';
+    });
+
+  
+ 
+
+    
+
+    function drawTasks() {
+        listBox.innerHTML = '';
+
+        if (taskList.length === 0) {
+            listBox.innerHTML = `
+                <div class="no-data">
+                    <i class="fas fa-clipboard-list"></i>
+                    <p>No tasks yet. Add one above!</p>
+                </div> `;
+            taskCount.textContent = '0 tasks';
+            return;
+        }
+
+        taskCount.textContent = `${taskList.length} tasks`;
+
+        taskList.forEach(task => {
+            const box = document.createElement('div');
+            box.className = 'task-row';
+            box.draggable = true;
+            box.dataset.id = task.id;
+
+            const d = new Date(task.date);
+            const dateStr = d.toLocaleDateString();
+            const timeStr = d.toLocaleTimeString();
+
+            let statusClass = task.status === 'done' ? 'done' : 
+                              task.status === 'doing' ? 'doing' : 'pending';
+
+            let prioClass = task.priority === 'high' ? 'prio-high' :
+                            task.priority === 'low' ? 'prio-low' : 'prio-med';
+
+            box.innerHTML = `
+                <div class="task-head">
+                    <div class="task-name">${task.title}</div>
+                    <span class="status ${statusClass}">${task.status}</span>
+                </div>
+                <div class="task-info">
+                    <div><i class="fas fa-clock"></i> ${task.mins} mins</div>
+                    <div><span class="${prioClass}"></span> ${task.priority}</div>
+                    <div><i class="fas fa-calendar"></i> ${dateStr}</div>
+                    <div><i class="fas fa-hourglass-half"></i> ${timeStr}</div>
+                </div>
+                ${task.spent ? `<div class="task-info"><i class="fas fa-stopwatch"></i> Took: ${formatTime(task.spent)}</div>` : ''}
+                <div class="task-btns">
+                    <button class="btn start" id="${task.id}"><i class="fas fa-play"></i></button>
+                    <button class="btn done" id="${task.id}"><i class="fas fa-check"></i></button>
+                    <button class="btn skip" id="${task.id}"><i class="fas fa-forward"></i></button>
+                    <button class="btn delete" id="${task.id}"><i class="fas fa-trash"></i></button>
+                </div> `;
+
+            listBox.appendChild(box);
+        });
+
+      
+        document.querySelectorAll('.start').forEach(b => b.click = () => startTask(+b.dataset.id));
+        document.querySelectorAll('.done').forEach(b => b.click = () => finishTask(+b.dataset.id));
+        document.querySelectorAll('.skip').forEach(b => b.click = () => skipTask(+b.dataset.id));
+        document.querySelectorAll('.delete').forEach(b => b.click = () => removeTask(+b.dataset.id));
+
+      
+        dragSetup();
+    }
+
+  
+    function dragSetup() {
+        const rows = document.querySelectorAll('.task-row');
+        let dragEl = null;
+
+        rows.forEach(row => {
+            row.addEventListener('dragstart', function() {
+                dragEl = this;
+                setTimeout(() => this.classList.add('dragging'), 0);
+            });
+
+            row.addEventListener('dragend', function() {
+                this.classList.remove('dragging');
+                dragEl = null;
+                const newOrder = [];
+                document.querySelectorAll('.task-row').forEach(r => {
+                    const id = +r.dataset.id;
+                    const t = taskList.find(x => x.id === id);
+                    if (t) newOrder.push(t);
+                });
+                taskList = newOrder;
+                save();
+            });
+        });
