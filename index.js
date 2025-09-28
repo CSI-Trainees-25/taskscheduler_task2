@@ -29,24 +29,6 @@ document.addEventListener('DOMContentLoaded', function() {
     let startTime = null;
 
 
-   function setup() {
-        drawTasks();
-        updateStats();
-        setMinDate();
-        if (taskList.length > 0) {
-            taskCount.textContent = `${taskList.length} tasks`;
-        }
-    }
-
-    function setMinDate() {
-        const now = new Date();
-        const y = now.getFullYear();
-        const m = String(now.getMonth() + 1).padStart(2, '0');
-        const d = String(now.getDate()).padStart(2, '0');
-        const h = String(now.getHours()).padStart(2, '0');
-        const min = String(now.getMinutes()).padStart(2, '0');
-        dateInput.min = `${y}-${m}-${d}T${h}:${min}`;
-    }
 
 
     addBtn.addEventListener('click', function() {
@@ -223,4 +205,99 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
   
+    function finishTask(id) {
+        const idx = taskList.findIndex(t => t.id === id);
+        if (idx === -1) return;
+
+        clearInterval(timer);
+        const task = taskList[idx];
+        task.status = 'done';
+        task.end = new Date().toISOString();
+        task.spent = Math.floor((Date.now() - startTime) / 1000);
+
+        if (idx === currentIndex) {
+            currentIndex = -1;
+            timerBox.innerHTML = '<i class="fas fa-check-circle"></i> Task done!';
+        }
+
+        updateStats();
+        save();
+        drawTasks();
+    }
+
+
+    function skipTask(id) {
+        const idx = taskList.findIndex(t => t.id === id);
+        if (idx === -1) return;
+
+        clearInterval(timer);
+        const task = taskList[idx];
+        task.status = 'pending';
+        task.start = null;
+
+        if (idx === currentIndex) {
+            currentIndex = -1;
+            timerBox.innerHTML = '<i class="fas fa-forward"></i> Task skipped!';
+        }
+
+        updateStats();
+        save();
+        drawTasks();
+    }
+
+  
+    function removeTask(id) {
+        if (!confirm('Delete this task?')) return;
+        const idx = taskList.findIndex(t => t.id === id);
+        if (idx === -1) return;
+
+        if (idx === currentIndex) {
+            clearInterval(timer);
+            currentIndex = -1;
+            timerBox.innerHTML = '<i class="fas fa-trash"></i> Task removed!';
+        }
+
+        taskList.splice(idx, 1);
+        updateStats();
+        save();
+        drawTasks();
+    }
+
+    
+    function runTimer() {
+        clearInterval(timer);
+        timer = setInterval(() => {
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                finishTask(taskList[currentIndex].id);
+                return;
+            }
+            const min = Math.floor(timeLeft / 60);
+            const sec = timeLeft % 60;
+            timerBox.innerHTML = `<i class="fas fa-clock"></i> ${min}:${sec.toString().padStart(2, '0')}`;
+            timeLeft--;
+        }, 1000);
+    }
+
+    function updateStats() {
+        totalCount.textContent = taskList.length;
+        doingCount.textContent = taskList.filter(t => t.status === 'doing').length;
+        doneCount.textContent = taskList.filter(t => t.status === 'done').length;
+    }
+
+    function formatTime(sec) {
+        const h = Math.floor(sec / 3600);
+        const m = Math.floor((sec % 3600) / 60);
+        const s = sec % 60;
+        if (h > 0) return `${h}h ${m}m ${s}s`;
+        if (m > 0) return `${m}m ${s}s`;
+        return `${s}s`;
+    }
+
+    function save() {
+        localStorage.setItem('taskList', JSON.stringify(taskList));
+    }
+
    
+    setup();
+});
