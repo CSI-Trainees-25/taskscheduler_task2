@@ -7,35 +7,22 @@ document.addEventListener('DOMContentLoaded', function() {
     const addBtn = document.getElementById('addBtn');
     const listBox = document.getElementById('listBox');
     const startAllBtn = document.getElementById('startAll');
-    const endBtn = document.getElementById('endBtn');
-    const finishBtn = document.getElementById('finishBtn');
-    const skipBtn = document.getElementById('skipBtn');
     const timerBox = document.getElementById('timerBox');
-    const summaryBox = document.getElementById('summaryBox');
-    const summaryItems = document.getElementById('summaryItems');
-    const backBtn = document.getElementById('backBtn');
-    const breakNote = document.getElementById('breakNote');
     const taskCount = document.getElementById('taskCount');
     const totalCount = document.getElementById('totalCount');
     const doingCount = document.getElementById('doingCount');
     const doneCount = document.getElementById('doneCount');
 
-  
     let taskList = JSON.parse(localStorage.getItem('taskList')) || [];
     let currentIndex = -1;
     let timer = null;
     let timeLeft = 0;
-    let onBreak = false;
     let startTime = null;
 
-  
     function setup() {
         drawTasks();
         updateStats();
         setMinDate();
-        if (taskList.length > 0) {
-            taskCount.textContent = `${taskList.length} tasks`;
-        }
     }
 
     function setMinDate() {
@@ -47,7 +34,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const min = String(now.getMinutes()).padStart(2, '0');
         dateInput.min = `${y}-${m}-${d}T${h}:${min}`;
     }
-
 
     addBtn.addEventListener('click', function() {
         const title = titleInput.value.trim();
@@ -77,7 +63,6 @@ document.addEventListener('DOMContentLoaded', function() {
         drawTasks();
         updateStats();
 
-    
         titleInput.value = '';
         durationInput.value = '';
         dateInput.value = '';
@@ -89,10 +74,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (taskList.length === 0) {
             listBox.innerHTML = `
-                <div class="no-data">
+                <div class="no-task">
                     <i class="fas fa-clipboard-list"></i>
                     <p>No tasks yet. Add one above!</p>
-                </div> `;
+                </div>`;
             taskCount.textContent = '0 tasks';
             return;
         }
@@ -107,7 +92,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const d = new Date(task.date);
             const dateStr = d.toLocaleDateString();
-            const timeStr = d.toLocaleTimeString();
+            const timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
             let statusClass = task.status === 'done' ? 'done' : 
                               task.status === 'doing' ? 'doing' : 'pending';
@@ -128,26 +113,42 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
                 ${task.spent ? `<div class="task-info"><i class="fas fa-stopwatch"></i> Took: ${formatTime(task.spent)}</div>` : ''}
                 <div class="task-btns">
-                    <button class="btn start" id="${task.id}"><i class="fas fa-play"></i></button>
-                    <button class="btn done" id="${task.id}"><i class="fas fa-check"></i></button>
-                    <button class="btn skip" id="${task.id}"><i class="fas fa-forward"></i></button>
-                    <button class="btn delete" id="${task.id}"><i class="fas fa-trash"></i></button>
-                </div> `;
+                    <button class="btn start-btn start-task" data-id="${task.id}"><i class="fas fa-play"></i></button>
+                    <button class="btn done-btn finish-task" data-id="${task.id}"><i class="fas fa-check"></i></button>
+                    <button class="btn skip-btn skip-task" data-id="${task.id}"><i class="fas fa-forward"></i></button>
+                    <button class="btn stop-btn delete-task" data-id="${task.id}"><i class="fas fa-trash"></i></button>
+                </div>`;
 
             listBox.appendChild(box);
         });
 
-      
-        document.querySelectorAll('.start').forEach(b => b.click = () => startTask(+b.dataset.id));
-        document.querySelectorAll('.done').forEach(b => b.click = () => finishTask(+b.dataset.id));
-        document.querySelectorAll('.skip').forEach(b => b.click = () => skipTask(+b.dataset.id));
-        document.querySelectorAll('.delete').forEach(b => b.click = () => removeTask(+b.dataset.id));
+        document.querySelectorAll('.start-task').forEach(btn => {
+            btn.addEventListener('click', function() {
+                startTask(parseInt(this.dataset.id));
+            });
+        });
 
-      
+        document.querySelectorAll('.finish-task').forEach(btn => {
+            btn.addEventListener('click', function() {
+                finishTask(parseInt(this.dataset.id));
+            });
+        });
+
+        document.querySelectorAll('.skip-task').forEach(btn => {
+            btn.addEventListener('click', function() {
+                skipTask(parseInt(this.dataset.id));
+            });
+        });
+
+        document.querySelectorAll('.delete-task').forEach(btn => {
+            btn.addEventListener('click', function() {
+                removeTask(parseInt(this.dataset.id));
+            });
+        });
+
         dragSetup();
     }
 
-  
     function dragSetup() {
         const rows = document.querySelectorAll('.task-row');
         let dragEl = null;
@@ -163,7 +164,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 dragEl = null;
                 const newOrder = [];
                 document.querySelectorAll('.task-row').forEach(r => {
-                    const id = +r.dataset.id;
+                    const id = parseInt(r.dataset.id);
                     const t = taskList.find(x => x.id === id);
                     if (t) newOrder.push(t);
                 });
@@ -176,8 +177,11 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             const after = getAfter(listBox, e.clientY);
             const drag = document.querySelector('.dragging');
-            if (!after) listBox.appendChild(drag);
-            else listBox.insertBefore(drag, after);
+            if (!after) {
+                listBox.appendChild(drag);
+            } else {
+                listBox.insertBefore(drag, after);
+            }
         });
     }
 
@@ -190,7 +194,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }, { offset: -Infinity }).el;
     }
 
-  
     function startTask(id) {
         const idx = taskList.findIndex(t => t.id === id);
         if (idx === -1) return;
@@ -198,12 +201,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const task = taskList[idx];
         const now = new Date();
         if (now < new Date(task.date)) {
-            alert("This task is scheduled later.");
+            alert("This task is scheduled for later.");
             return;
         }
 
         if (currentIndex !== -1 && taskList[currentIndex].status === 'doing') {
-            pauseTask();
+            taskList[currentIndex].status = 'pending';
         }
 
         task.status = 'doing';
@@ -217,7 +220,6 @@ document.addEventListener('DOMContentLoaded', function() {
         runTimer();
     }
 
-  
     function finishTask(id) {
         const idx = taskList.findIndex(t => t.id === id);
         if (idx === -1) return;
@@ -226,18 +228,20 @@ document.addEventListener('DOMContentLoaded', function() {
         const task = taskList[idx];
         task.status = 'done';
         task.end = new Date().toISOString();
-        task.spent = Math.floor((Date.now() - startTime) / 1000);
+        
+        if (task.start) {
+            task.spent = Math.floor((new Date(task.end) - new Date(task.start)) / 1000);
+        }
 
         if (idx === currentIndex) {
             currentIndex = -1;
-            timerBox.innerHTML = '<i class="fas fa-check-circle"></i> Task done!';
+            timerBox.innerHTML = '<i class="fas fa-check-circle"></i> Task completed!';
         }
 
         updateStats();
         save();
         drawTasks();
     }
-
 
     function skipTask(id) {
         const idx = taskList.findIndex(t => t.id === id);
@@ -258,16 +262,16 @@ document.addEventListener('DOMContentLoaded', function() {
         drawTasks();
     }
 
-  
     function removeTask(id) {
-        if (!confirm('Delete this task?')) return;
+        if (!confirm('Are you sure you want to delete this task?')) return;
+        
         const idx = taskList.findIndex(t => t.id === id);
         if (idx === -1) return;
 
         if (idx === currentIndex) {
             clearInterval(timer);
             currentIndex = -1;
-            timerBox.innerHTML = '<i class="fas fa-trash"></i> Task removed!';
+            timerBox.innerHTML = '<i class="fas fa-trash"></i> Task deleted!';
         }
 
         taskList.splice(idx, 1);
@@ -276,13 +280,14 @@ document.addEventListener('DOMContentLoaded', function() {
         drawTasks();
     }
 
-    
     function runTimer() {
         clearInterval(timer);
         timer = setInterval(() => {
             if (timeLeft <= 0) {
                 clearInterval(timer);
-                finishTask(taskList[currentIndex].id);
+                if (currentIndex !== -1) {
+                    finishTask(taskList[currentIndex].id);
+                }
                 return;
             }
             const min = Math.floor(timeLeft / 60);
@@ -311,6 +316,14 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.setItem('taskList', JSON.stringify(taskList));
     }
 
-   
+    startAllBtn.addEventListener('click', function() {
+        const pendingTasks = taskList.filter(t => t.status === 'pending');
+        if (pendingTasks.length > 0) {
+            startTask(pendingTasks[0].id);
+        } else {
+            alert('No pending tasks to start!');
+        }
+    });
+
     setup();
 });
