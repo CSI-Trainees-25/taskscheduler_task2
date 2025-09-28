@@ -176,3 +176,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 save();
             });
         });
+
+        listBox.addEventListener('dragover', e => {
+            e.preventDefault();
+            const after = getAfter(listBox, e.clientY);
+            const drag = document.querySelector('.dragging');
+            if (!after) listBox.appendChild(drag);
+            else listBox.insertBefore(drag, after);
+        });
+    }
+
+    function getAfter(container, y) {
+        const els = [...container.querySelectorAll('.task-row:not(.dragging)')];
+        return els.reduce((closest, el) => {
+            const box = el.getBoundingClientRect();
+            const offset = y - box.top - box.height / 2;
+            return (offset < 0 && offset > closest.offset) ? { offset, el } : closest;
+        }, { offset: -Infinity }).el;
+    }
+
+  
+   
