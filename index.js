@@ -28,11 +28,6 @@ document.addEventListener('DOMContentLoaded', function() {
     let onBreak = false;
     let startTime = null;
 
-
-
-
-    
-
   
     function setup() {
         drawTasks();
@@ -54,7 +49,40 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
 
+    addBtn.addEventListener('click', function() {
+        const title = titleInput.value.trim();
+        const mins = parseInt(durationInput.value);
+        const date = dateInput.value;
+        const priority = prioritySelect.value;
+
+        if (!title || isNaN(mins) || mins <= 0 || !date) {
+            alert('Please fill all fields correctly');
+            return;
+        }
+
+        const task = {
+            id: Date.now(),
+            title,
+            mins,
+            date,
+            priority,
+            status: 'pending',
+            start: null,
+            end: null,
+            spent: null
+        };
+
+        taskList.push(task);
+        save();
+        drawTasks();
+        updateStats();
+
     
+        titleInput.value = '';
+        durationInput.value = '';
+        dateInput.value = '';
+        prioritySelect.value = 'medium';
+    });
 
     function drawTasks() {
         listBox.innerHTML = '';
