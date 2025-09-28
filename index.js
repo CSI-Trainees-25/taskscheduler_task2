@@ -196,4 +196,31 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
   
+    function startTask(id) {
+        const idx = taskList.findIndex(t => t.id === id);
+        if (idx === -1) return;
+
+        const task = taskList[idx];
+        const now = new Date();
+        if (now < new Date(task.date)) {
+            alert("This task is scheduled later.");
+            return;
+        }
+
+        if (currentIndex !== -1 && taskList[currentIndex].status === 'doing') {
+            pauseTask();
+        }
+
+        task.status = 'doing';
+        task.start = new Date().toISOString();
+        currentIndex = idx;
+        timeLeft = task.mins * 60;
+        startTime = Date.now();
+
+        updateStats();
+        drawTasks();
+        runTimer();
+    }
+
+  
    
