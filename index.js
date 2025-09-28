@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const d = new Date(task.date);
             const dateStr = d.toLocaleDateString();
-            const timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const timeStr = d.toLocaleTimeString( { hour: '2-digit', minute: '2-digit' });
 
             let statusClass = task.status === 'done' ? 'done' : 
                               task.status === 'doing' ? 'doing' : 'pending';
