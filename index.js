@@ -21,3 +21,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const doneCount = document.getElementById('doneCount');
 
   
+    let taskList = JSON.parse(localStorage.getItem('taskList')) || [];
+    let currentIndex = -1;
+    let timer = null;
+    let timeLeft = 0;
+    let onBreak = false;
+    let startTime = null;
+
+
+   function setup() {
+        drawTasks();
+        updateStats();
+        setMinDate();
+        if (taskList.length > 0) {
+            taskCount.textContent = `${taskList.length} tasks`;
+        }
+    }
+
+   
