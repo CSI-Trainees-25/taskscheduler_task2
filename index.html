@@ -3,146 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Task Timer App</title>
+    <title>Task Timer</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="indexcss.css">
 </head>
 <body>
-<div class="wrapper">
-    <header class="top-header">
+<div class="container">
+    <div class="header">
         <h1><i class="fas fa-tasks"></i> Task Timer</h1>
-        <p>Plan, organize, and track your tasks</p>
-    </header>
+        <p>Manage your tasks with timer</p>
+    </div>
 
-    <div id="mainPage">
-        <div class="main-grid">
-            <div class="box form-box">
-                <h2><i class="fas fa-plus-circle"></i> Add Task</h2>
+    <div id="main">
+        <div class="row">
+            <div class="card formcard">
+                <h2><i class="fas fa-plus"></i> New Task</h2>
                 
-                <div class="field">
-                    <label>Task Title</label>
-                    <input type="text" id="titleInput" placeholder="Enter task name">
+                <div class="inputgroup">
+                    <label>Task Name</label>
+                    <input type="text" id="taskname" placeholder="What to do?">
                 </div>
 
-                <div class="field">
-                    <label>Duration (minutes)</label>
-                    <input type="number" id="durationInput" placeholder="e.g. 30" min="1">
+                <div class="inputgroup">
+                    <label>Time (minutes)</label>
+                    <input type="number" id="tasktime" placeholder="30" min="1">
                 </div>
 
-                <div class="field">
-                    <label>Date & Time</label>
-                    <input type="datetime-local" id="dateInput">
+                <div class="inputgroup">
+                    <label>When</label>
+                    <input type="datetime-local" id="taskdate">
                 </div>
 
-                <div class="field">
+                <div class="inputgroup">
                     <label>Priority</label>
-                    <select id="prioritySelect">
+                    <select id="taskprio">
                         <option value="low">Low</option>
                         <option value="medium" selected>Medium</option>
                         <option value="high">High</option>
                     </select>
                 </div>
 
-                <button class="btn add-btn" id="addBtn">
+                <button class="button addbutton" id="addtask">
                     <i class="fas fa-plus"></i> Add Task
                 </button>
             </div>
 
-            <div class="box task-box">
-                <div class="task-head">
-                    <h2><i class="fas fa-list-check"></i> Task List</h2>
-                    <span id="taskCount">0 tasks</span>
+            <div class="card taskcard">
+                <div class="cardhead">
+                    <h2><i class="fas fa-list"></i> Tasks</h2>
+                    <span id="tasktotal">0 tasks</span>
                 </div>
 
-                <div id="listBox" class="task-list">
-                    <div class="no-task">
-                        <i class="fas fa-clipboard-list"></i>
-                        <p>No tasks yet</p>
+                <div id="taskslist" class="tasks">
+                    <div class="notasks">
+                        <i class="fas fa-clipboard"></i>
+                        <p>No tasks added</p>
                     </div>
                 </div>
 
-                <div class="drag-info">
-                    <i class="fas fa-hand-point-up"></i> Drag to reorder
+                <div class="dragnote">
+                    <i class="fas fa-hand"></i> Drag to rearrange
                 </div>
             </div>
         </div>
 
-        <div class="box progress-box">
-            <h2><i class="fas fa-chart-line"></i> Progress</h2>
-            <div class="stats-row">
-                <div class="stat">
-                    <div class="num" id="totalCount">0</div>
-                    <div class="label">Total</div>
+        <div class="card progresscard">
+            <h2><i class="fas fa-chart"></i> Progress</h2>
+            <div class="numbers">
+                <div class="numberbox">
+                    <div class="bigtext" id="alltasks">0</div>
+                    <div class="smalltext">Total</div>
                 </div>
-                <div class="stat">
-                    <div class="num" id="doingCount">0</div>
-                    <div class="label">In Progress</div>
+                <div class="numberbox">
+                    <div class="bigtext" id="activetasks">0</div>
+                    <div class="smalltext">Active</div>
                 </div>
-                <div class="stat">
-                    <div class="num" id="doneCount">0</div>
-                    <div class="label">Done</div>
+                <div class="numberbox">
+                    <div class="bigtext" id="completedtasks">0</div>
+                    <div class="smalltext">Done</div>
                 </div>
             </div>
         </div>
 
-        <div class="box timer-box">
+        <div class="card timercard">
             <h2><i class="fas fa-clock"></i> Timer</h2>
-            <div id="timerBox" class="timer-display">
+            <div id="timerdisplay" class="timerscreen">
                 <i class="fas fa-clock"></i> Ready
             </div>
-            <div class="task-buttons">
-                <button class="btn start-btn" id="startAll">
+            <div class="currentinfo" id="currentinfo"></div>
+            <div class="buttons">
+                <button class="button startbutton" id="startall">
                     <i class="fas fa-play"></i> Start All
                 </button>
             </div>
-            <div class="break-note">
-                <i class="fas fa-coffee"></i> Breaks between tasks
+            <div class="note">
+                <i class="fas fa-mug-hot"></i> 30 sec breaks between tasks
             </div>
         </div>
     </div>
 
-    <div id="summaryPage" class="summary-screen" style="display: none;">
-        <div class="box summary-box">
-            <div class="summary-header">
-                <h2><i class="fas fa-trophy"></i> All Tasks Completed!</h2>
-                <p>Great job! Here's your summary</p>
+    <div id="summary" class="summarypage" style="display: none;">
+        <div class="card summarycard">
+            <div class="summaryhead">
+                <h2><i class="fas fa-star"></i> All Done!</h2>
+                <p>Good work! Check your stats</p>
             </div>
 
-            <div class="summary-stats">
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="fas fa-clock"></i></div>
-                    <div class="stat-info">
-                        <div class="stat-num" id="totalTime">0 min</div>
-                        <div class="stat-label">Planned Time</div>
+            <div class="statscards">
+                <div class="statcard">
+                    <div class="staticon"><i class="fas fa-clock"></i></div>
+                    <div class="stattext">
+                        <div class="statnum" id="plannedtime">0 min</div>
+                        <div class="statdesc">Planned</div>
                     </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="fas fa-stopwatch"></i></div>
-                    <div class="stat-info">
-                        <div class="stat-num" id="actualTime">0 min</div>
-                        <div class="stat-label">Actual Time</div>
+                <div class="statcard">
+                    <div class="staticon"><i class="fas fa-stopwatch"></i></div>
+                    <div class="stattext">
+                        <div class="statnum" id="actualtime">0 min</div>
+                        <div class="statdesc">Actual</div>
                     </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="fas fa-bolt"></i></div>
-                    <div class="stat-info">
-                        <div class="stat-num" id="efficiency">0%</div>
-                        <div class="stat-label">Efficiency</div>
+                <div class="statcard">
+                    <div class="staticon"><i class="fas fa-bolt"></i></div>
+                    <div class="stattext">
+                        <div class="statnum" id="taskeff">0%</div>
+                        <div class="statdesc">Efficiency</div>
                     </div>
                 </div>
             </div>
 
-            <div class="task-details">
-                <h3><i class="fas fa-list-check"></i> Task Details</h3>
-                <div id="taskDetailsList" class="details-list"></div>
+            <div class="tasklist">
+                <h3><i class="fas fa-tasks"></i> Task Details</h3>
+                <div id="taskdetails" class="detailsbox"></div>
             </div>
 
-            <div class="summary-actions">
-                <button class="btn back-btn" id="backToApp">
+            <div class="actionbuttons">
+                <button class="button backbutton" id="goback">
                     <i class="fas fa-arrow-left"></i> Back
                 </button>
-                <button class="btn new-btn" id="newSession">
-                    <i class="fas fa-plus"></i> New Session
+                <button class="button newbutton" id="startnew">
+                    <i class="fas fa-plus"></i> New
                 </button>
             </div>
         </div>
