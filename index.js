@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const d = new Date(task.date);
             const datestr = d.toLocaleDateString();
-            const timestr = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            const timestr = d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
 
             item.innerHTML = `
                 <div class="cardhead">
